@@ -4,6 +4,7 @@ library(ggplot2)
 library(MASS)
 library(DataExplorer)
 library(e1071)
+library(randomForest)
 x<-read_csv("x.csv")
 glimpse(x)
 "Rows: 5,350
@@ -128,8 +129,11 @@ x<-as.data.frame(x) #must change in data frame type for Pearson
  train <- x[trainIndex,] 
  test <- x[-trainIndex,] 
  
+#These Models are built using log1p(Price) "Normalization of Response or Target Vars" and Removing Outlier for Prices
+ 
+ 
  #build the multiple regression model using all vars
- model1<-lm(Price~.,data = x)
+ model1<-lm(Price~.,data = train)
  summary(model1)
  
  #Predict model using test
@@ -137,7 +141,19 @@ x<-as.data.frame(x) #must change in data frame type for Pearson
  
  #RMSE and R2 for Model Comparison
 RMSE(predict1,test$Price)
+# 0.1177331
+#for removing na , have to use hydroGOF library
+rmse(predict1,test$Price,na.action=TRUE) #RMSE and rmse's results are the same.
 R2(predict1,test$Price)
+#0.8667364
+
+#build the RandomForest model using all vars
+model2<-randomForest(Price~.,data=train,importance=TRUE)
+predict2<-predict(model2,test)
+RMSE(predict2,test$Price)
+#0.05279622
+R2(predict2,test$Price)
+#0.9738934
 
 
 
