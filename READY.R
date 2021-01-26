@@ -5,155 +5,133 @@ library(MASS)
 library(DataExplorer)
 library(e1071)
 library(randomForest)
-x<-read_csv("x.csv")
-glimpse(x)
-"Rows: 5,350
-Columns: 64
-$ Price                         <dbl> 40600, 45500, 43600, 37400, 42600, ...
-$ MPG                           <dbl> 22, 22, 22, 22, 21, 21, 21, 19, 20,...
-$ passenger_capacity            <dbl> 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,...
-$ passenger_door                <dbl> 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,...
-$ weight_lbs                    <dbl> 3790, 3829, 3821, 3783, 4026, 4068,...
-$ passenger_volume_ft3          <dbl> 104, 104, 104, 104, 104, 104, 104, ...
-$ wheelbase_in                  <dbl> 108, 108, 108, 108, 108, 108, 108, ...
-$ trach_width_front_in          <dbl> 64, 64, 64, 64, 64, 64, 64, 63, 63,...
-$ height_in                     <dbl> 66, 66, 66, 66, 66, 66, 66, 65, 65,...
-$ fuel_tank_gal                 <dbl> 17, 17, 17, 17, 17, 17, 17, 16, 16,...
-$ sae_net_torque_rpm            <dbl> 280, 280, 280, 280, 280, 280, 280, ...
-$ sae_net_horsepower_rpm        <dbl> 272, 272, 272, 272, 272, 272, 272, ...
-$ Displacement                  <dbl> 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4,...
-$ trans_type                    <chr> "10", "10", "10", "10", "10", "10",...
-$ airbag_frontal_driver         <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-$ airbag_frontal_passenger      <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-$ airbag_passenger_switch_onoff <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ airbag_side_body_front        <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-$ airbag_side_body_rear         <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ aibag_side_head_front         <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-$ aibag_side_head_rear          <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-$ brakes_abs                    <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-$ child_safety_doorlocks_rear   <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-$ daytime_running_lights        <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-$ traction_control              <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-$ night_vision                  <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ rollover_protection_bars      <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ fog_lamps                     <dbl> 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0,...
-$ parking_aid                   <dbl> 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0,...
-$ tire_pressure_motor           <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-$ backup_camera                 <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-$ stability_control             <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-$ Mileage                       <dbl> 50000, 50000, 50000, 50000, 50000, ...
-$ basic_years                   <dbl> 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,...
-$ corrosion_miles_km            <dbl> 150000, 150000, 150000, 150000, 150...
-$ corrosion_years               <dbl> 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,...
-$ Drivetrain_Years              <dbl> 70000, 70000, 70000, 70000, 70000, ...
-$ Curb_to                       <dbl> 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,...
-$ road_size                     <dbl> 39, 39, 39, 39, 39, 39, 39, 39, 39,...
-$ Make                          <dbl> 50000, 50000, 50000, 50000, 50000, ...
-$ front_wid                     <dbl> 2019, 2019, 2019, 2019, 2019, 2019,...
-$ ratio                         <dbl> 235, 235, 255, 235, 235, 235, 255, ...
-$ rim                           <dbl> 55, 55, 45, 55, 55, 55, 45, 60, 60,...
-$ Engine_Electric               <dbl> 19, 19, 20, 19, 19, 19, 20, 18, 18,...
-$ Engine_Flat                   <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Engine_I6                     <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Engine_l3                     <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Engine_l4                     <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Engine_l5                     <dbl> 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,...
-$ Engine_l6                     <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Engine_V6                     <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Engine_V8                     <dbl> 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,...
-$ Engine_V10                    <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Engine_V12                    <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Engine_W8                     <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Engine_W12                    <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Drivetrain_4WD                <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Drivetrain_AWD                <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Drivetrain_FWD                <dbl> 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0,...
-$ Drivetrain_RWD                <dbl> 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,...
-$ Category_Car                  <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Category_Pickup               <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Category_SUV                  <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-$ Category_Van                  <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-"
+        x<-read.csv("x.csv")
+        glimpse(x)
+
 #checking missing values
-plot_missing(x)
-x<-dplyr::select(x,-ratio)
+        plot_missing(x)
+        x<-dplyr::select(x,-ratio)
+
 #checking outliers using boxplot IQR
-boxplot(x$Price)
-out<-boxplot.stats(x$Price)$out # shows outliers Values
-out_ind<-which(x$Price %in% c(out)) #showing row number of outliers
+        boxplot(x$Price)
+        out<-boxplot.stats(x$Price)$out # shows outliers Values
+        out_ind<-which(x$Price %in% c(out)) #showing row number of outliers
 
 #using mtext() to detect outliers
-boxplot(x$Price,ylab = "hwy",main = "Boxplot of highway miles per gallon")
-mtext(paste("Outliers: ", paste(out, collapse = ", ")))
+        boxplot(x$Price,ylab = "hwy",main = "Boxplot of highway miles per gallon")
+        mtext(paste("Outliers: ", paste(out, collapse = ", ")))
 
 #outlier detection using Percentile
-lower_bound <- quantile(x$Price, 0.025)
-upper_bound <- quantile(x$Price, 0.975)
-outlier_ind <- which(x$Price < lower_bound | x$Price > upper_bound)
-x[outlier_ind, "Price"]
+        lower_bound <- quantile(x$Price, 0.025)
+        upper_bound <- quantile(x$Price, 0.975)
+        outlier_ind <- which(x$Price < lower_bound | x$Price > upper_bound)
+        x[outlier_ind, "Price"]
 
 #Remove outliers from Dataset
-x<-x[-which(x$Price %in% out),]
+        x<-x[-which(x$Price %in% out),]
 #OR
-x<-x[-which(x$Price < lower_bound | x$Price > upper_bound),]
-boxplot(x$Price) 
+        x<-x[-which(x$Price < lower_bound | x$Price > upper_bound),]
+        boxplot(x$Price) 
 
 #changing category to dummy vars 
-x<-dummy_cols(x,select_columns = "Engine") #example
+        x<-dummy_cols(x,select_columns = "Engine") #example
 
 # drop unnessory colums from data
-x<-drop_columns(x,ind = "Engin_NA")
+        x<-drop_columns(x,ind = "Engin_NA")
 
 # Handling Missing Values in R
-x$MPG<-impute(x$MPG,mean) #By mean
-x$MPG<-impute(x$MPG,median) #By median
-x$Price<-impute(x$Price,mean)
-x$Drivetrain<-impute(New$x,mode)
-plot_missing(x)
+        x$MPG<-impute(x$MPG,mean) #By mean
+        x$MPG<-impute(x$MPG,median) #By median
+        x$Price<-impute(x$Price,mean)
+        x$Drivetrain<-impute(New$x,mode)
+        plot_missing(x)
 
 #Normalization of response or target or dependent Var
- #Firstly, Checking the skewness of Price
-skewness(x$Price)#
+#Firstly, Checking the skewness of Price
+        skewness(x$Price)
+        skewness(log1p(x$Price))
+        skewness(sqrt(x$Price))
+
+#Histogram
+        histogram(x$Price)
+        histogram(log1p(x$Price))
+        histogram(sqrt(x$Price))
 
 #changing data table to numeric for Pearson Correlation
-x<-lapply(x,as.numeric)
-x<-as.data.frame(x) #must change in data frame type for Pearson
+        x<-lapply(x,as.numeric)
+        x<-as.data.frame(x) #must change in data frame type for Pearson
 
 #Pearson Correlation
- cor(x,method = "pearson")
+        corr<-cor(x,method = "pearson")
+        View(corr)
  
 #Choose the features from Pearson Correlation Data
 #Split the data into train and test
- set.seed(7267166) 
- trainIndex <- createDataPartition(x$Price, p = 0.7,list = FALSE)
- train <- x[trainIndex,] 
- test <- x[-trainIndex,] 
+        set.seed(7267166) 
+        trainIndex <- createDataPartition(x$Price, p = 0.8,list = FALSE)
+        train <- x[trainIndex,] 
+        test <- x[-trainIndex,] 
  
 #These Models are built using log1p(Price) "Normalization of Response or Target Vars" and Removing Outlier for Prices
  
  
  #build the multiple regression model using all vars
- model1<-lm(Price~.,data = train)
- summary(model1)
+         model1<-lm(Price~.,data = train)
+         summary(model1)
  
  #Predict model using test
- predict1<-predict(model1,test)
+         predict1<-predict(model1,test)
  
+ #Must Remove Nulls and outliers
  #RMSE and R2 for Model Comparison
-RMSE(predict1,test$Price)
+ 
+#With normalization
+        RMSE(predict1,test$Price)
 # 0.1177331
 #for removing na , have to use hydroGOF library
-rmse(predict1,test$Price,na.action=TRUE) #RMSE and rmse's results are the same.
-R2(predict1,test$Price)
+        rmse(predict1,test$Price,na.action=TRUE) #RMSE and rmse's results are the same.
+        R2(predict1,test$Price)
 #0.8667364
 
+#Without(Normalization) for Multiple Regression
+        RMSE(predict1,test$Price)
+#4085.752
+        R2(predict1,test$Price)
+#0.7367931
+
+
+#For RF,have to change the format/true data type(numeric,...)
 #build the RandomForest model using all vars
-model2<-randomForest(Price~.,data=train,importance=TRUE)
-predict2<-predict(model2,test)
-RMSE(predict2,test$Price)
-#0.05279622
-R2(predict2,test$Price)
-#0.9738934
+
+#With Nor 
+        model2<-randomForest(Price~.,data=train,importance=TRUE)
+        predict2<-predict(model2,test)summary(lm(Price~Mileage,data = train))
+
+        RMSE(predict2,test$Price)
+#0.05279622(nor)
+        R2(predict2,test$Price)
+#0.9738934(nor)
+
+#Without Normalization for Random Forest 
+        RMSE(predict2,test$Price)
+#2136.949 #without nor
+        R2(predict2,test$Price)
+#0.9313983 #without nor
+
+#Changing the log values to numeric forms
+        exp(predict2)
+        exp(log1p(x$Price))
+
+#Calculating the residual values for Random Forest Model
+        res<-test$Price-model2$predicted
+        histogram(res)
+
+# YOU SHOULD CHECK NORMALITY OF ERRORS AFTER MODELLING , ERRORS ARE ASSUMED TO FOLLOW A NORMAL DISTRIBUTION WITH A MEAN OF zero.
+# LOGARITHMIC TRANSFORMATION IS A CONVIENT MEAN OF TRANSFORMING A HIGHLY SKEWED VARIABLE INTO A MORE NORMALIZED DATASET.
+# wHEN MODELING VARS WITH NON-LINEAR RELATIONSHIPS,CHANCES OF PRODUCING ERRORS MAY ALSO BE SKEWED NEGATIVELY.
+# IN THEORY,WE WANT TO PRODUCE THE SMALLEST ERROR POSSIBLE WHEN MAKING A PREDICTION,WHILE ALSO TAKING INTO ACCOUNT THAT WE SHOULD NOT BE OVERFITTING MODEL
+# USING THE LOGARITHMIC OF ONE OR MORE VARIABLES IMPROVES THE FIT OF MODEL BY TRANSFORMING THE DISTRIBUTION OF FEATURES TO A NORMALLY-SHAPED BELL CURVE.
+
 
 
 
